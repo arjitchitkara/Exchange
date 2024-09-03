@@ -30,7 +30,6 @@ This project is designed to build an exchange system, divided into multiple part
 - **Frontend**:
   - Next.js
   - Tailwind CSS
-  - 
   
 - **Database**:
   - PostgreSQL
