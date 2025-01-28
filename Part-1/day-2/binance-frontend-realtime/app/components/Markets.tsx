@@ -17,9 +17,9 @@ interface MarketCardProps {
 
 function MarketCategoryCard({ title, markets }: MarketCardProps) {
   return (
-    <div className="bg-[#1C1D21] rounded-xl border border-gray-800/50 backdrop-blur-sm p-4">
-      <h2 className="text-white text-sm font-medium mb-3">{title}</h2>
-      <div className="space-y-3">
+    <div className="bg-[#1C1D21] rounded-xl border border-gray-800/50 backdrop-blur-sm p-3">
+      <h2 className="text-white text-sm font-medium mb-2">{title}</h2>
+      <div className="space-y-2">
         {markets.slice(0, 5).map((market) => (
           <div key={market.symbol} className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -109,14 +109,14 @@ export const Markets = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0D0E12] pt-20">
+    <div className="min-h-screen bg-[#0D0E12] pt-4">
       <div className="relative mx-auto max-w-[1440px] w-full px-3">
         {/* Background Gradient Effects */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[500px] bg-[#00b2ff]/10 rounded-full blur-[128px] -z-10" />
         <div className="absolute top-32 right-1/4 w-[500px] h-[400px] bg-purple-500/10 rounded-full blur-[128px] -z-10" />
         
         {/* Market Stats Bar */}
-        <div className="flex items-center justify-between mb-4 text-sm px-2">
+        <div className="flex items-center justify-between mb-2 text-sm">
           <div className="flex items-center space-x-8">
             <div className="text-gray-400">
               24h Volume: <span className="text-white font-medium">${tickers?.reduce((acc, t) => acc + Number(t.volume), 0).toLocaleString()}</span>
@@ -132,7 +132,7 @@ export const Markets = () => {
         </div>
 
         {/* Market Categories */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-3 gap-4 mb-3">
           <MarketCategoryCard title="New" markets={newMarkets} />
           <MarketCategoryCard title="Top Gainers" markets={topGainers} />
           <MarketCategoryCard title="Popular" markets={popular} />
