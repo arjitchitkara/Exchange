@@ -10,6 +10,42 @@ import { Sparklines, SparklinesLine } from "react-sparklines";
 const TABS = ["Spot", "Futures", "Lending"] as const;
 type Tab = typeof TABS[number];
 
+interface MarketCardProps {
+  title: string;
+  markets: Ticker[];
+}
+
+function MarketCategoryCard({ title, markets }: MarketCardProps) {
+  return (
+    <div className="bg-[#1C1D21] rounded-xl border border-gray-800/50 backdrop-blur-sm p-4">
+      <h2 className="text-white text-sm font-medium mb-3">{title}</h2>
+      <div className="space-y-3">
+        {markets.slice(0, 5).map((market) => (
+          <div key={market.symbol} className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="h-6 w-6 rounded-full bg-[#2C2D33] flex items-center justify-center">
+                <img
+                  src="/default-coin.png"
+                  alt={market.symbol}
+                  className="h-4 w-4"
+                />
+              </div>
+              <span className="text-white text-sm">{market.symbol.replace("USDT", "")}</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-white text-sm">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className={`text-sm font-medium ${Number(market.priceChangePercent) >= 0 ? "text-[#00F2A3]" : "text-[#FF5C5C]"}`}>
+                {Number(market.priceChangePercent) > 0 ? "+" : ""}
+                {Number(market.priceChangePercent).toFixed(2)}%
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Helper function to generate mock sparkline data
 function generateSparklineData(min: number, max: number, points: number = 50): number[] {
   const data: number[] = [];
@@ -38,7 +74,6 @@ export const Markets = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("Spot");
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     getTickers()
@@ -53,9 +88,13 @@ export const Markets = () => {
       });
   }, []);
 
-  const filteredTickers = tickers?.filter((ticker) =>
-    ticker.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+  const sortedByChange = tickers?.slice().sort((a, b) => 
+    Number(b.priceChangePercent) - Number(a.priceChangePercent)
   );
+
+  const topGainers = sortedByChange?.filter(t => Number(t.priceChangePercent) > 0) || [];
+  const newMarkets = tickers?.slice(0, 5) || [];
+  const popular = tickers?.slice(0, 5) || [];
 
   if (loading)
     return (
@@ -70,26 +109,33 @@ export const Markets = () => {
   );
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[#0D0E12] pt-6 pb-12">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#0D0E12] pt-4">
       <div className="relative mx-auto max-w-[1440px] w-full px-3">
         {/* Background Gradient Effects */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[500px] bg-[#00b2ff]/10 rounded-full blur-[128px] -z-10" />
         <div className="absolute top-32 right-1/4 w-[500px] h-[400px] bg-purple-500/10 rounded-full blur-[128px] -z-10" />
         
         {/* Market Stats Bar */}
-        <div className="flex items-center justify-between mb-6 text-sm px-2">
+        <div className="flex items-center justify-between mb-4 text-sm px-2">
           <div className="flex items-center space-x-8">
             <div className="text-gray-400">
-              24h Volume: <span className="text-white font-medium">${filteredTickers?.reduce((acc, t) => acc + Number(t.volume), 0).toLocaleString()}</span>
+              24h Volume: <span className="text-white font-medium">${tickers?.reduce((acc, t) => acc + Number(t.volume), 0).toLocaleString()}</span>
             </div>
             <div className="text-gray-400">
-              Markets: <span className="text-white font-medium">{filteredTickers?.length}</span>
+              Markets: <span className="text-white font-medium">{tickers?.length}</span>
             </div>
           </div>
           <div className="flex items-center space-x-2 text-gray-400">
             <span>BTC Dominance:</span>
             <span className="text-white font-medium">48.2%</span>
           </div>
+        </div>
+
+        {/* Market Categories */}
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <MarketCategoryCard title="New" markets={newMarkets} />
+          <MarketCategoryCard title="Top Gainers" markets={topGainers} />
+          <MarketCategoryCard title="Popular" markets={popular} />
         </div>
 
         {/* Main Content */}
@@ -111,37 +157,11 @@ export const Markets = () => {
             ))}
           </div>
 
-          {/* Search Bar */}
-          <div className="p-4 border-b border-gray-800">
-            <div className="relative max-w-md mx-2">
-              <input
-                type="text"
-                placeholder="Search markets"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#2C2D33] text-white px-4 py-2.5 rounded-lg pl-10 focus:outline-none focus:ring-1 focus:ring-[#00b2ff] transition-all"
-              />
-              <svg
-                className="absolute left-3 top-3 h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
-
           <div className="overflow-x-auto">
             <table className="w-full">
               <MarketHeader />
               <tbody className="divide-y divide-gray-800">
-                {filteredTickers?.map((m) => (
+                {tickers?.map((m) => (
                   <MarketRow key={m.symbol} market={m} />
                 ))}
               </tbody>
