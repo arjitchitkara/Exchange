@@ -34,7 +34,7 @@ export const Markets = () => {
       <div className="flex flex-col bg-black shadow-md rounded-lg">
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-xl font-semibold text-white">Markets</h2>
-        </div>
+          </div>
         <div className="overflow-y-auto max-h-[500px]">
           <table className="min-w-full divide-y divide-gray-700">
             <MarketHeader />
@@ -55,17 +55,17 @@ function MarketRow({ market }: { market: Ticker }) {
   return (
     <tr
       className="cursor-pointer hover:bg-gray-700 transition-all"
-      onClick={() => router.push(`/trade/${market.symbol}`)}
-    >
+        onClick={() => router.push(`/trade/${market.symbol}`)}
+      >
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center space-x-3">
           <img
             src={
               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVvBqZC_Q1TSYObZaMvK0DRFeHZDUtVMh08Q&s"
             }
-            alt={market.symbol}
+              alt={market.symbol}
             className="h-10 w-10 rounded-full border border-gray-500"
-          />
+            />
           <div>
             <p className="text-sm font-medium text-white">{market.symbol}</p>
             <p className="text-xs text-gray-400">Pair</p>
