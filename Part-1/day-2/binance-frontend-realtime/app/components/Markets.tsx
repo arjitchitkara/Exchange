@@ -5,9 +5,33 @@ import { Ticker } from "../utils/types";
 import { getTickers } from "../utils/httpClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Sparklines, SparklinesLine } from "react-sparklines";
 
 const TABS = ["Spot", "Futures", "Lending"] as const;
 type Tab = typeof TABS[number];
+
+// Helper function to generate mock sparkline data
+function generateSparklineData(min: number, max: number, points: number = 50): number[] {
+  const data: number[] = [];
+  let lastValue = (max + min) / 2;
+  
+  for (let i = 0; i < points; i++) {
+    const change = (Math.random() - 0.5) * ((max - min) / 5);
+    lastValue = Math.max(min, Math.min(max, lastValue + change));
+    data.push(lastValue);
+  }
+  return data;
+}
+
+function SparklineChart({ data, color }: { data: number[], color: string }) {
+  return (
+    <div className="w-[120px] h-[32px]">
+      <Sparklines data={data} width={120} height={32}>
+        <SparklinesLine color={color} style={{ strokeWidth: 1, fill: "none" }} />
+      </Sparklines>
+    </div>
+  );
+}
 
 export const Markets = () => {
   const [tickers, setTickers] = useState<Ticker[]>();
@@ -165,6 +189,13 @@ function MarketRow({ market }: { market: Ticker }) {
   // Mock market cap calculation
   const mockMarketCap = (lastPrice * volume).toFixed(2);
 
+  // Generate mock sparkline data based on price change
+  const sparklineData = generateSparklineData(
+    lastPrice * 0.95,  // 5% below current price
+    lastPrice * 1.05,  // 5% above current price
+    50
+  );
+
   return (
     <tr
       className="hover:bg-[#2C2D33] transition-all cursor-pointer h-[72px]"
@@ -205,7 +236,10 @@ function MarketRow({ market }: { market: Ticker }) {
         </span>
       </td>
       <td className="px-8 py-4">
-        <div className="w-[120px] h-[32px] bg-[#2C2D33] rounded opacity-50"></div>
+        <SparklineChart 
+          data={sparklineData} 
+          color={priceChange >= 0 ? "#00F2A3" : "#FF5C5C"}
+        />
       </td>
     </tr>
   );
