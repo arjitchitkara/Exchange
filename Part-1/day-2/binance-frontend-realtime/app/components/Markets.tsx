@@ -98,18 +98,18 @@ export const Markets = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-4rem)] bg-[#0D0E12]">
+      <div className="flex justify-center items-center min-h-screen pt-16 bg-[#0D0E12]">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#00b2ff]"></div>
       </div>
     );
   if (error) return (
-    <div className="flex justify-center items-center h-[calc(100vh-4rem)] bg-[#0D0E12]">
+    <div className="flex justify-center items-center min-h-screen pt-16 bg-[#0D0E12]">
       <div className="text-center text-red-500 bg-red-500/10 px-4 py-2 rounded-lg">{error}</div>
     </div>
   );
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[#0D0E12] pt-4">
+    <div className="min-h-screen bg-[#0D0E12] pt-20">
       <div className="relative mx-auto max-w-[1440px] w-full px-3">
         {/* Background Gradient Effects */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[500px] bg-[#00b2ff]/10 rounded-full blur-[128px] -z-10" />
