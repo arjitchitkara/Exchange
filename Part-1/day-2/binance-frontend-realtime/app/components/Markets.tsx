@@ -39,7 +39,7 @@ const MarketCategoryCard = React.memo(function MarketCategoryCard({ title, marke
             onClick={(e) => handleClick(e, market.symbol)}
             role="button"
             tabIndex={0}
-    >
+          >
             <div className="flex items-center space-x-2">
               <div className="h-6 w-6 rounded-full bg-[#2C2D33] flex items-center justify-center">
                 <img
@@ -50,16 +50,16 @@ const MarketCategoryCard = React.memo(function MarketCategoryCard({ title, marke
               </div>
               <span className="text-white text-sm">{market.symbol.replace("USDT", "")}</span>
             </div>
-        <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
               <span className="text-white text-sm">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               <span className={`text-sm font-medium ${Number(market.priceChangePercent) >= 0 ? "text-[" + COLORS.SUCCESS + "]" : "text-[" + COLORS.DANGER + "]"}`}>
                 {Number(market.priceChangePercent) > 0 ? "+" : ""}
                 {Number(market.priceChangePercent).toFixed(2)}%
               </span>
-          </div>
+            </div>
           </div>
         ))}
-        </div>
+      </div>
     </div>
   );
 });
@@ -416,12 +416,12 @@ export const Markets = () => {
               alt={`${market.symbol} icon`}
               className="h-6 w-6"
             />
-        </div>
+          </div>
           <div>
             <p className="text-sm font-medium text-white">{market.symbol.replace("USDT", "")}</p>
             <p className="text-xs text-gray-400">USDT</p>
-      </div>
-    </div>
+          </div>
+        </div>
       </td>
       <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
         <span className="text-sm text-white">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
