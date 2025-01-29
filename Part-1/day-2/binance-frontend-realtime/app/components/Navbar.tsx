@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearch } from '../context/SearchContext';
+import { FiSearch } from 'react-icons/fi';
 
 export function Navbar() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { searchQuery, setSearchQuery } = useSearch();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0D0E12]/95 backdrop-blur-md border-b border-gray-800">
@@ -16,47 +18,25 @@ export function Navbar() {
               Exchange
             </Link>
             <div className="flex items-center space-x-6">
-              <Link href="/markets" className="text-white hover:text-gray-300">
+              <Link href="/" className="text-white hover:text-gray-300">
                 Markets
               </Link>
-              <Link href="/trade" className="text-gray-400 hover:text-gray-300">
-                Trade
-              </Link>
-              <Link href="/futures" className="text-gray-400 hover:text-gray-300">
-                Futures
-              </Link>
-              <Link href="/lend" className="text-gray-400 hover:text-gray-300">
-                Lend
-              </Link>
-              <button className="text-gray-400 hover:text-gray-300">
-                More
-              </button>
             </div>
           </div>
 
           {/* Center section - Search */}
-          <div className="flex-1 max-w-md mx-4">
+          <div className="flex-1 max-w-lg px-4">
             <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="text"
-                placeholder="Search markets"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-800 rounded-lg bg-[#2C2D33] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00b2ff] focus:ring-opacity-50"
+                placeholder="Search markets..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#1C1D21] text-white px-4 py-2 rounded-lg pl-10 focus:outline-none focus:ring-1 focus:ring-[#00b2ff] transition-all"
               />
-              <svg
-                className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
             </div>
           </div>
 
