@@ -1,106 +1,128 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get("registered");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/",
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.message || "Invalid credentials");
+        return;
+      }
+
+      const data = await response.json();
+      // Store the token
+      localStorage.setItem('token', data.token);
+      
+      router.push("/");
+    } catch (err) {
+      setError("Failed to sign in. Please try again.");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0D0E12] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Sign in to your account
+    <div className="min-h-screen flex items-center justify-center bg-[#0D0E12] relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://backpack.exchange/candlestick-chart.svg"
+          alt="Candlestick Chart"
+          fill
+          style={{ objectFit: 'cover', opacity: 0.1 }}
+        />
+      </div>
+
+      <div className="max-w-md w-full space-y-8 p-8 bg-[#1C1D21]/80 backdrop-blur-md rounded-lg relative z-10">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 mb-4">
+            <svg viewBox="0 0 24 24" fill="none" className="text-[#FF5C5C]">
+              <path d="M17 8C17 10.7614 14.7614 13 12 13C9.23858 13 7 10.7614 7 8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8Z" fill="currentColor"/>
+              <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-white">
+            Sign In
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            Or{" "}
-            <Link href="/register" className="text-[#00b2ff] hover:text-[#33c3ff]">
-              create a new account
-            </Link>
-          </p>
         </div>
 
+        {justRegistered && (
+          <div className="bg-green-500/10 border border-green-500 text-green-500 px-4 py-3 rounded-lg" role="alert">
+            <span className="block sm:inline">Registration successful! Please sign in.</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-700 bg-[#1C1D21] placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-[#00b2ff] focus:border-[#00b2ff] focus:z-10 sm:text-sm"
-                placeholder="Email address"
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-700 bg-[#1C1D21] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00b2ff] focus:border-transparent"
+                  placeholder="Email"
+                />
+              </div>
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-700 bg-[#1C1D21] placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-[#00b2ff] focus:border-[#00b2ff] focus:z-10 sm:text-sm"
-                placeholder="Password"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-700 bg-[#1C1D21] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00b2ff] focus:border-transparent"
+                  placeholder="Password"
+                />
+              </div>
             </div>
           </div>
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[#00b2ff] hover:bg-[#33c3ff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00b2ff]"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg text-white bg-[#00b2ff] hover:bg-[#33c3ff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00b2ff] transition-colors duration-200"
             >
               Sign in
             </button>
           </div>
 
-          <div className="flex items-center justify-center space-x-4">
-            <button
-              type="button"
-              onClick={() => signIn("github", { callbackUrl: "/" })}
-              className="flex items-center justify-center px-4 py-2 border border-gray-700 rounded-lg bg-[#1C1D21] text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"></path>
-              </svg>
-              GitHub
-            </button>
-            <button
-              type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="flex items-center justify-center px-4 py-2 border border-gray-700 rounded-lg bg-[#1C1D21] text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                />
-              </svg>
-              Google
-            </button>
+          <div className="text-sm text-center">
+            <Link href="/forgot-password" className="text-[#00b2ff] hover:text-[#33c3ff]">
+              Forgot your password?
+            </Link>
           </div>
         </form>
       </div>
