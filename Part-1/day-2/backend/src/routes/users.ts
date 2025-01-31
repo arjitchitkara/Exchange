@@ -14,11 +14,6 @@ router.get('/:email', async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { email: req.params.email },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-      },
     });
 
     if (!user) {

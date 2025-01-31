@@ -56,16 +56,20 @@ const CryptoIcon = ({ symbol }: { symbol: string }) => {
   }
 
   return (
-    <Image
-      src={iconUrl}
-      alt={`${symbol} icon`}
-      width={isSvg ? 40 : 32}
-      height={isSvg ? 40 : 32}
-      className="rounded-full"
-      onError={() => setError(true)}
-      priority={true}
-      loading="eager"
-    />
+    <div className="relative w-full h-full flex items-center justify-center">
+      <div className="relative w-full h-full">
+        <Image
+          src={iconUrl}
+          alt={`${symbol} icon`}
+          fill
+          sizes="(max-width: 640px) 24px, 32px"
+          className="rounded-full object-contain"
+          onError={() => setError(true)}
+          priority={true}
+          loading="eager"
+        />
+      </div>
+    </div>
   );
 };
 
@@ -73,18 +77,18 @@ export function SymbolList() {
   const marketSymbols = MARKET_SYMBOLS.map(parseMarketSymbol);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
+    <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4">
       {marketSymbols.map((market) => (
         <div
           key={market.pair}
-          className="bg-[#1E1F25] rounded-lg p-4 hover:bg-[#2C2D33] transition-colors cursor-pointer"
+          className="bg-[#1E1F25] rounded-lg p-3 sm:p-4 hover:bg-[#2C2D33] transition-colors cursor-pointer"
         >
-          <div className="flex items-center space-x-3">
-            <div className="relative w-8 h-8">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="relative w-6 h-6 sm:w-8 sm:h-8">
               <CryptoIcon symbol={market.pair} />
             </div>
             <div>
-              <h3 className="text-white font-medium">
+              <h3 className="text-white text-sm sm:text-base font-medium">
                 {market.baseSymbol}/{market.quoteSymbol}
               </h3>
               {market.isPerpetual && (
