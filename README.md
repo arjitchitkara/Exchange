@@ -143,16 +143,11 @@ docker-compose up --build
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📫 Support
-
-For support, email [your-email@example.com](mailto:your-email@example.com) or open an issue in the repository.
 
 ## 🙏 Acknowledgments
 
-- Binance API for market data
+- Binance docs for architecture
+- Backpack Exchange API for market data
 - TradingView for charting libraries
 - The open-source community for various tools and libraries used in this project
 
-```
-
-```
