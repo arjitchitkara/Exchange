@@ -1,70 +1,85 @@
 // Common symbol mappings for icon fetching
 const symbolMapping: { [key: string]: string } = {
-  // Major cryptocurrencies
-  'BTC': 'bitcoin',
-  'ETH': 'ethereum',
-  'SOL': 'solana',
-  'USDC': 'usd-coin',
-  'USDT': 'tether',
-  'BONK': 'bonk',
-  'JUP': 'jupiter',
-  'MATIC': 'polygon',
-  'DOT': 'polkadot',
-  'ADA': 'cardano',
-  'AVAX': 'avalanche',
-  'LINK': 'chainlink',
-  'UNI': 'uniswap',
-  'DOGE': 'dogecoin',
-  'SHIB': 'shiba-inu',
-  // Additional tokens
-  'ATOM': 'cosmos',
-  'XRP': 'ripple',
-  'LTC': 'litecoin',
-  'DAI': 'dai',
-  'AAVE': 'aave',
-  'ALGO': 'algorand',
-  'APE': 'apecoin',
-  'APT': 'aptos',
-  'ARB': 'arbitrum',
-  'BLUR': 'blur',
-  'CFG': 'centrifuge',
-  'COMP': 'compound',
-  'CRV': 'curve-dao-token',
-  'FTM': 'fantom',
-  'GMT': 'stepn',
-  'HBAR': 'hedera-hashgraph',
-  'IMX': 'immutable-x',
-  'INJ': 'injective-protocol',
-  'LDO': 'lido-dao',
-  'MANA': 'decentraland',
-  'NEAR': 'near',
-  'OP': 'optimism',
-  'PEPE': 'pepe',
-  'PYTH': 'pyth-network',
-  'RUNE': 'thorchain',
-  'SAND': 'the-sandbox',
-  'SEI': 'sei-network',
-  'SNX': 'synthetix-network-token',
-  'SUI': 'sui',
-  'TIA': 'celestia',
-  'WLD': 'worldcoin-wld',
-  'XLM': 'stellar',
-  'ZRX': '0x'
+  'AAVE': 'AAVE',
+  'ACT': 'ACT',
+  'ANIME': 'ANIME',
+  'BOME': 'BOME',
+  'BONK': 'BONK',
+  'BTC': 'BTC',
+  'CLOUD': 'CLOUD',
+  'DOGE': 'DOGE',
+  'DRIFT': 'DRIFT',
+  'ENA': 'ENA',
+  'ETH': 'ETH',
+  'GOAT': 'GOAT',
+  'HNT': 'HNT',
+  'HONEY': 'HONEY',
+  'IO': 'IO',
+  'JTO': 'JTO',
+  'JUP': 'JUP',
+  'J': 'J',
+  'KMNO': 'KMNO',
+  'LDO': 'LDO',
+  'LINK': 'LINK',
+  'MELANIA': 'MELANIA',
+  'MEW': 'MEW',
+  'ME': 'ME',
+  'MOBILE': 'MOBILE',
+  'MOODENG': 'MOODENG',
+  'MOTHER': 'MOTHER',
+  'ONDO': 'ONDO',
+  'PENGU': 'PENGU',
+  'PEPE': 'PEPE',
+  'POL': 'POL',
+  'PRCL': 'PRCL',
+  'PYTH': 'PYTH',
+  'RAY': 'RAY',
+  'RENDER': 'RENDER',
+  'SHFL': 'SHFL',
+  'SHIB': 'SHIB',
+  'SOL': 'SOL',
+  'SONIC': 'SONIC',
+  'STRK': 'STRK',
+  'SUI': 'SUI',
+  'TNSR': 'TNSR',
+  'TRUMP': 'TRUMP',
+  'UNI': 'UNI',
+  'USDT': 'USDT',
+  'WEN': 'WEN',
+  'WIF': 'WIF',
+  'WLD': 'WLD',
+  'W': 'W',
+  'XRP': 'XRP',
+  'ZEX': 'ZEX',
+  'ZRO': 'ZRO'
 };
 
-export function getIconUrl(baseAsset: string): string[] {
-  const normalizedSymbol = symbolMapping[baseAsset] || baseAsset.toLowerCase();
+// List of symbols that should use SVG instead of PNG
+const svgSymbols = new Set([
+  'SUI',
+  'DOGE',
+  'XRP',
+  'ENA',
+  'MELANIA',
+  'TRUMP',
+  'ZEX',
+  'W'
+]);
+
+export function getIconUrl(symbol: string): string {
+  // Extract base symbol (remove _USDC or _USDC_PERP)
+  const baseSymbol = symbol.split('_')[0];
   
-  return [
-    // Primary URL - CoinGecko by ID (most reliable)
-    `https://assets.coingecko.com/coins/images/1/${normalizedSymbol}/thumb.png`,
-    // Fallback 1 - Alternative CoinGecko format
-    `https://assets.coingecko.com/coins/images/1/${baseAsset.toLowerCase()}/thumb.png`,
-    // Fallback 2 - Direct CoinGecko CDN
-    `https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@master/svg/color/${baseAsset.toLowerCase()}.svg`,
-    // Final fallback - Base64 encoded generic crypto icon
-    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTQiIGZpbGw9IiM3MDcwNzAiLz48cGF0aCBkPSJNMTYgNGE2IDYgMCAwIDAtNiA2djRhNiA2IDAgMCAwIDEyIDB2LTRhNiA2IDAgMCAwLTYtNnptMCA4YTIgMiAwIDEgMSAyLTIgMiAyIDAgMCAxLTIgMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4='
-  ];
+  // Use SVG for specific symbols, PNG for others
+  const extension = svgSymbols.has(baseSymbol) ? 'svg' : 'png';
+  
+  // For SVG files, use lowercase filename without _USDC
+  if (extension === 'svg') {
+    return `/icons/${baseSymbol.toLowerCase()}.svg`;
+  }
+  
+  // For PNG files, use the original format
+  return `/icons/${baseSymbol}_USDC.png`;
 }
 
 // Helper function to get display format

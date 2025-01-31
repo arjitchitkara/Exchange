@@ -20,6 +20,11 @@ interface MarketCardProps {
   markets: Ticker[];
     }
     
+const getPercentageColor = (percentage: number) => {
+  if (percentage === 0) return "text-white";
+  return percentage > 0 ? "text-[#00C853]" : "text-[#FF1744]";
+};
+
 const MarketCategoryCard = React.memo(function MarketCategoryCard({ title, markets }: MarketCardProps) {
   const router = useRouter();
   
@@ -29,30 +34,26 @@ const MarketCategoryCard = React.memo(function MarketCategoryCard({ title, marke
   }, [router]);
 
   return (
-    <div className="bg-[#1C1D21] rounded-xl border border-gray-800/50 backdrop-blur-sm p-3">
+    <div className="bg-[#14151b] rounded-xl border border-gray-800/50 backdrop-blur-sm p-3">
       <h2 className="text-white text-sm font-medium mb-2">{title}</h2>
       <div className="space-y-2">
         {markets.slice(0, 5).map((market) => (
           <div 
             key={market.symbol} 
-            className="flex items-center justify-between cursor-pointer hover:bg-[#2C2D33] p-2 rounded-lg transition-colors"
+            className="flex items-center justify-between cursor-pointer hover:bg-[#1C1D21] p-2 rounded-lg transition-colors"
             onClick={(e) => handleClick(e, market.symbol)}
             role="button"
             tabIndex={0}
           >
             <div className="flex items-center space-x-2">
-              <div className="h-6 w-6 rounded-full bg-[#2C2D33] flex items-center justify-center">
-                <img
-                  src="/default-coin.png"
-                  alt={`${market.symbol} icon`}
-                  className="h-4 w-4"
-                />
+              <div className="h-6 w-6 rounded-full bg-[#1C1D21] flex items-center justify-center">
+                <CryptoIcon symbol={market.symbol} size="small" />
               </div>
               <span className="text-white text-sm">{market.symbol.replace("USDT", "")}</span>
             </div>
             <div className="flex items-center space-x-3">
               <span className="text-white text-sm">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              <span className={`text-sm font-medium ${Number(market.priceChangePercent) >= 0 ? "text-[" + COLORS.SUCCESS + "]" : "text-[" + COLORS.DANGER + "]"}`}>
+              <span className={`text-sm font-medium ${getPercentageColor(Number(market.priceChangePercent))}`}>
                 {Number(market.priceChangePercent) > 0 ? "+" : ""}
                 {Number(market.priceChangePercent).toFixed(2)}%
               </span>
@@ -179,6 +180,70 @@ function MarketHeader({ sortField, sortDirection, onSort }: MarketHeaderProps) {
   );
 }
 
+// Add the GenericCoinIcon component
+const GenericCoinIcon = () => (
+  <div className="h-6 w-6 rounded-full bg-[#2C2D33] flex items-center justify-center">
+    <svg viewBox="0 0 32 32" className="h-4 w-4 text-gray-400">
+      <circle cx="16" cy="16" r="14" fill="currentColor" opacity="0.2"/>
+      <path d="M16 4a6 6 0 00-6 6v4a6 6 0 0012 0v-4a6 6 0 00-6-6zm0 8a2 2 0 110-4 2 2 0 010 4z" fill="currentColor"/>
+    </svg>
+  </div>
+);
+
+// Update the CryptoIcon component
+const CryptoIcon = ({ symbol, size = 'default' }: { symbol: string, size?: 'small' | 'default' }) => {
+  const [error, setError] = useState(false);
+  const baseSymbol = symbol.split('_')[0];
+  const iconUrl = `/icons/${baseSymbol}_USDC.png`;
+
+  const dimensions = {
+    small: { width: 24, height: 24 },
+    default: { width: 40, height: 40 }
+  };
+
+  const { width, height } = dimensions[size];
+
+  // Special cases for SVG icons
+  const svgSymbols = new Set(['SUI', 'DOGE', 'XRP', 'ENA', 'MELANIA', 'TRUMP', 'ZEX', 'W']);
+  if (svgSymbols.has(baseSymbol)) {
+    return (
+      <div className={`relative ${size === 'small' ? 'h-6 w-6' : 'h-12 w-12'} flex items-center justify-center`}>
+        <Image
+          src={`/icons/${baseSymbol.toLowerCase()}.svg`}
+          alt={`${symbol} icon`}
+          width={width}
+          height={height}
+          className="rounded-full object-contain"
+          onError={() => setError(true)}
+          priority={true}
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`flex items-center justify-center ${size === 'small' ? 'h-6 w-6' : 'h-12 w-12'}`}>
+        <GenericCoinIcon />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`relative ${size === 'small' ? 'h-6 w-6' : 'h-12 w-12'} flex items-center justify-center`}>
+      <Image
+        src={iconUrl}
+        alt={`${symbol} icon`}
+        width={width}
+        height={height}
+        className="rounded-full object-contain"
+        onError={() => setError(true)}
+        priority={true}
+      />
+    </div>
+  );
+};
+
 export const Markets = () => {
   const [activeTab, setActiveTab] = useState<Tab>("Spot");
   const { searchQuery, setSearchQuery } = useSearch();
@@ -298,7 +363,7 @@ export const Markets = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0D0E12]">
+    <div className="min-h-screen bg-[#14151b]">
       <div className="pt-24 pb-8">
         <div className="relative mx-auto max-w-[1440px] w-full px-3">
           {/* Background Gradient Effects */}
@@ -329,7 +394,7 @@ export const Markets = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex flex-col bg-[#1C1D21] shadow-xl rounded-xl border border-gray-800/50 backdrop-blur-sm">
+          <div className="flex flex-col bg-[#14151b] shadow-xl rounded-xl border border-gray-800/50 backdrop-blur-sm">
             {/* Tabs */}
             <div className="flex border-b border-gray-800">
               {TABS.map((tab) => (
@@ -373,7 +438,9 @@ export const Markets = () => {
             </div>
           </div>
   );
-};const MarketRow = React.memo(function MarketRow({ market, index }: { market: Ticker; index: number }) {
+};
+
+const MarketRow = React.memo(function MarketRow({ market, index }: { market: Ticker; index: number }) {
   const router = useRouter();
   const priceChange = Number(market.priceChangePercent);
   const volume = Number(market.volume);
@@ -401,7 +468,7 @@ export const Markets = () => {
 
   return (
     <tr
-      className="hover:bg-[#2C2D33] transition-all cursor-pointer h-[72px] focus-within:bg-[#2C2D33] focus-within:outline-none"
+      className="hover:bg-[#1C1D21] transition-all cursor-pointer h-[80px] focus-within:bg-[#1C1D21] focus-within:outline-none"
       onClick={handleClick}
       onKeyDown={handleKeyPress}
       role="row"
@@ -409,34 +476,28 @@ export const Markets = () => {
       aria-rowindex={index + 1}
     >
       <td className="px-8 py-4 whitespace-nowrap" role="cell">
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-[#2C2D33] flex items-center justify-center">
-            <img
-              src="/default-coin.png"
-              alt={`${market.symbol} icon`}
-              className="h-6 w-6"
-            />
+        <div className="flex items-center space-x-4">
+          <div className="h-12 w-12 rounded-full bg-[#1C1D21] flex items-center justify-center">
+            <CryptoIcon symbol={market.symbol} />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{market.symbol.replace("USDT", "")}</p>
-            <p className="text-xs text-gray-400">USDT</p>
+            <p className="text-base font-semibold text-white">{market.symbol.replace("USDT", "")}</p>
+            <p className="text-sm text-gray-400">USDT</p>
           </div>
         </div>
       </td>
       <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
-        <span className="text-sm text-white">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+        <span className="text-base font-medium text-white">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
       </td>
       <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
-        <span className="text-sm text-gray-300">${mockMarketCap}M</span>
+        <span className="text-base font-medium text-gray-300">${mockMarketCap}M</span>
       </td>
       <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
-        <span className="text-sm text-gray-300">${Number(market.volume).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+        <span className="text-base font-medium text-gray-300">${Number(market.volume).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
       </td>
       <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
         <span
-          className={`text-sm font-medium ${
-            priceChange > 0 ? "text-[" + COLORS.SUCCESS + "]" : "text-[" + COLORS.DANGER + "]"
-          }`}
+          className={`text-base font-semibold ${getPercentageColor(priceChange)}`}
         >
           {priceChange > 0 ? "+" : ""}
           {priceChange.toFixed(2)}%
@@ -445,7 +506,7 @@ export const Markets = () => {
       <td className="px-8 py-4" role="cell">
         <SparklineChart 
           data={sparklineData} 
-          color={priceChange >= 0 ? COLORS.SUCCESS : COLORS.DANGER}
+          color={priceChange === 0 ? COLORS.TEXT.PRIMARY : (priceChange > 0 ? COLORS.SUCCESS : COLORS.DANGER)}
         />
       </td>
     </tr>
