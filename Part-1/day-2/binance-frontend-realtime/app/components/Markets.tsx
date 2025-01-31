@@ -194,7 +194,6 @@ const GenericCoinIcon = () => (
 const CryptoIcon = ({ symbol, size = 'default' }: { symbol: string, size?: 'small' | 'default' }) => {
   const [error, setError] = useState(false);
   const baseSymbol = symbol.split('_')[0];
-  const iconUrl = `/icons/${baseSymbol}_USDC.png`;
 
   const dimensions = {
     small: { width: 24, height: 24 },
@@ -202,44 +201,49 @@ const CryptoIcon = ({ symbol, size = 'default' }: { symbol: string, size?: 'smal
   };
 
   const { width, height } = dimensions[size];
+  const containerClass = size === 'small' ? 'h-6 w-6' : 'h-12 w-12';
 
   // Special cases for SVG icons
   const svgSymbols = new Set(['SUI', 'DOGE', 'XRP', 'ENA', 'MELANIA', 'TRUMP', 'ZEX', 'W']);
   if (svgSymbols.has(baseSymbol)) {
     return (
-      <div className={`relative ${size === 'small' ? 'h-6 w-6' : 'h-12 w-12'} flex items-center justify-center`}>
-        <Image
-          src={`/icons/${baseSymbol.toLowerCase()}.svg`}
-          alt={`${symbol} icon`}
-          width={width}
-          height={height}
-          className="rounded-full object-contain"
-          onError={() => setError(true)}
-          priority={true}
-        />
+      <div className={`relative ${containerClass} flex items-center justify-center`}>
+        <div className="relative w-full h-full">
+          <Image
+            src={`/icons/${baseSymbol.toLowerCase()}.svg`}
+            alt={`${symbol} icon`}
+            fill
+            sizes={size === 'small' ? '24px' : '40px'}
+            className="rounded-full object-contain"
+            onError={() => setError(true)}
+            priority={true}
+          />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center ${size === 'small' ? 'h-6 w-6' : 'h-12 w-12'}`}>
+      <div className={`flex items-center justify-center ${containerClass}`}>
         <GenericCoinIcon />
       </div>
     );
   }
 
   return (
-    <div className={`relative ${size === 'small' ? 'h-6 w-6' : 'h-12 w-12'} flex items-center justify-center`}>
-      <Image
-        src={iconUrl}
-        alt={`${symbol} icon`}
-        width={width}
-        height={height}
-        className="rounded-full object-contain"
-        onError={() => setError(true)}
-        priority={true}
-      />
+    <div className={`relative ${containerClass} flex items-center justify-center`}>
+      <div className="relative w-full h-full">
+        <Image
+          src={`/icons/${baseSymbol}_USDC.png`}
+          alt={`${symbol} icon`}
+          fill
+          sizes={size === 'small' ? '24px' : '40px'}
+          className="rounded-full object-contain"
+          onError={() => setError(true)}
+          priority={true}
+        />
+      </div>
     </div>
   );
 };

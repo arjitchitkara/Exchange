@@ -56,16 +56,20 @@ const CryptoIcon = ({ symbol }: { symbol: string }) => {
   }
 
   return (
-    <Image
-      src={iconUrl}
-      alt={`${symbol} icon`}
-      width={isSvg ? 40 : 32}
-      height={isSvg ? 40 : 32}
-      className="rounded-full"
-      onError={() => setError(true)}
-      priority={true}
-      loading="eager"
-    />
+    <div className="relative w-8 h-8 flex items-center justify-center">
+      <div className="relative w-full h-full">
+        <Image
+          src={iconUrl}
+          alt={`${symbol} icon`}
+          fill
+          sizes="32px"
+          className="rounded-full object-contain"
+          onError={() => setError(true)}
+          priority={true}
+          loading="eager"
+        />
+      </div>
+    </div>
   );
 };
 
