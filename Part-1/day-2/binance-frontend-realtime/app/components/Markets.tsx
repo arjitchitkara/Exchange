@@ -52,7 +52,7 @@ const MarketCategoryCard = React.memo(function MarketCategoryCard({ title, marke
               <span className="text-white text-sm">{market.symbol.replace("USDT", "")}</span>
             </div>
             <div className="flex items-center space-x-3">
-              <span className="text-white text-sm">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className="text-white text-sm hidden sm:inline">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               <span className={`text-sm font-medium ${getPercentageColor(Number(market.priceChangePercent))}`}>
                 {Number(market.priceChangePercent) > 0 ? "+" : ""}
                 {Number(market.priceChangePercent).toFixed(2)}%
@@ -368,15 +368,15 @@ export const Markets = () => {
 
   return (
     <div className="min-h-screen bg-[#14151b]">
-      <div className="pt-24 pb-8">
+      <div className="pt-16 sm:pt-24 pb-8">
         <div className="relative mx-auto max-w-[1440px] w-full px-3">
           {/* Background Gradient Effects */}
-          <div className="absolute top-0 left-1/4 w-[600px] h-[500px] bg-[#00b2ff]/10 rounded-full blur-[128px] -z-10" />
-          <div className="absolute top-32 right-1/4 w-[500px] h-[400px] bg-purple-500/10 rounded-full blur-[128px] -z-10" />
+          <div className="absolute top-0 left-1/4 w-[300px] sm:w-[600px] h-[250px] sm:h-[500px] bg-[#00b2ff]/10 rounded-full blur-[128px] -z-10" />
+          <div className="absolute top-32 right-1/4 w-[250px] sm:w-[500px] h-[200px] sm:h-[400px] bg-purple-500/10 rounded-full blur-[128px] -z-10" />
           
           {/* Market Stats Bar */}
-          <div className="flex items-center justify-between mb-6 text-sm">
-            <div className="flex items-center space-x-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 mb-4 sm:mb-0">
               <div className="text-gray-400">
                 24h Volume: <span className="text-white font-medium">${totalVolume.toLocaleString()}</span>
               </div>
@@ -391,20 +391,20 @@ export const Markets = () => {
           </div>
 
           {/* Market Categories */}
-          <div className="grid grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
             <MarketCategoryCard title="New" markets={newMarkets} />
             <MarketCategoryCard title="Top Gainers" markets={topGainers} />
             <MarketCategoryCard title="Popular" markets={popular} />
           </div>
 
           {/* Main Content */}
-          <div className="flex flex-col bg-[#14151b] shadow-xl rounded-xl border border-gray-800/50 backdrop-blur-sm">
+          <div className="flex flex-col bg-[#14151b] shadow-xl rounded-xl border border-gray-800/50 backdrop-blur-sm overflow-hidden">
             {/* Tabs */}
-            <div className="flex border-b border-gray-800">
+            <div className="flex border-b border-gray-800 overflow-x-auto">
               {TABS.map((tab) => (
                 <button
                   key={tab}
-                  className={`px-8 py-4 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#00b2ff] focus:ring-opacity-50 ${
+                  className={`px-4 sm:px-8 py-4 text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-[#00b2ff] focus:ring-opacity-50 ${
                     activeTab === tab
                       ? "text-white border-b-2 border-[#00b2ff] bg-gray-800/20"
                       : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/10"
@@ -436,11 +436,11 @@ export const Markets = () => {
                   No markets found matching "{searchQuery}"
                 </div>
               )}
-                </div>
-          </div>
-              </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -472,42 +472,42 @@ const MarketRow = React.memo(function MarketRow({ market, index }: { market: Tic
 
   return (
     <tr
-      className="hover:bg-[#1C1D21] transition-all cursor-pointer h-[80px] focus-within:bg-[#1C1D21] focus-within:outline-none"
+      className="hover:bg-[#1C1D21] transition-all cursor-pointer h-[60px] sm:h-[80px] focus-within:bg-[#1C1D21] focus-within:outline-none"
       onClick={handleClick}
       onKeyDown={handleKeyPress}
       role="row"
       tabIndex={0}
       aria-rowindex={index + 1}
     >
-      <td className="px-8 py-4 whitespace-nowrap" role="cell">
-        <div className="flex items-center space-x-4">
-          <div className="h-12 w-12 rounded-full bg-[#1C1D21] flex items-center justify-center">
-            <CryptoIcon symbol={market.symbol} />
+      <td className="px-4 sm:px-8 py-4 whitespace-nowrap" role="cell">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="h-8 w-8 sm:h-12 sm:w-12 rounded-full bg-[#1C1D21] flex items-center justify-center">
+            <CryptoIcon symbol={market.symbol} size={window.innerWidth < 640 ? 'small' : 'default'} />
           </div>
           <div>
-            <p className="text-base font-semibold text-white">{market.symbol.replace("USDT", "")}</p>
-            <p className="text-sm text-gray-400">USDT</p>
+            <p className="text-sm sm:text-base font-semibold text-white">{market.symbol.replace("USDT", "")}</p>
+            <p className="text-xs sm:text-sm text-gray-400">USDT</p>
           </div>
         </div>
       </td>
-      <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
-        <span className="text-base font-medium text-white">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+      <td className="px-4 sm:px-8 py-4 text-right whitespace-nowrap" role="cell">
+        <span className="text-sm sm:text-base font-medium text-white">${Number(market.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
       </td>
-      <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
+      <td className="hidden sm:table-cell px-8 py-4 text-right whitespace-nowrap" role="cell">
         <span className="text-base font-medium text-gray-300">${mockMarketCap}M</span>
       </td>
-      <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
+      <td className="hidden sm:table-cell px-8 py-4 text-right whitespace-nowrap" role="cell">
         <span className="text-base font-medium text-gray-300">${Number(market.volume).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
       </td>
-      <td className="px-8 py-4 text-right whitespace-nowrap" role="cell">
+      <td className="px-4 sm:px-8 py-4 text-right whitespace-nowrap" role="cell">
         <span
-          className={`text-base font-semibold ${getPercentageColor(priceChange)}`}
+          className={`text-sm sm:text-base font-semibold ${getPercentageColor(priceChange)}`}
         >
           {priceChange > 0 ? "+" : ""}
           {priceChange.toFixed(2)}%
         </span>
       </td>
-      <td className="px-8 py-4" role="cell">
+      <td className="hidden sm:table-cell px-8 py-4" role="cell">
         <SparklineChart 
           data={sparklineData} 
           color={priceChange === 0 ? COLORS.TEXT.PRIMARY : (priceChange > 0 ? COLORS.SUCCESS : COLORS.DANGER)}
