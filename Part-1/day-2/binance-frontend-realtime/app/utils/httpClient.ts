@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Depth, KLine, Ticker, Trade } from "./types";
 
 // const BASE_URL = "http://localhost:4000/api/v1";
@@ -10,6 +10,30 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   }
 });
+
+// Type for error handler callback
+type ErrorHandler<T> = (error: AxiosError | Error) => Promise<T>;
+
+// Generic error handler with proper typing
+async function handleRequestError<T>(
+  error: unknown,
+  endpoint: string,
+  fallback: T,
+  customHandler?: ErrorHandler<T>
+): Promise<T> {
+  if (axios.isAxiosError(error)) {
+    console.error(
+      `Error fetching ${endpoint}:`,
+      error.response ? error.response.data : error.message
+    );
+    if (customHandler) {
+      return customHandler(error);
+    }
+  } else {
+    console.error(`Unknown error fetching ${endpoint}:`, error);
+  }
+  return fallback;
+}
 
 export async function getTicker(market: string): Promise<Ticker> {
   const tickers = await getTickers();
@@ -23,23 +47,39 @@ export async function getTicker(market: string): Promise<Ticker> {
 export async function getTickers(): Promise<Ticker[]> {
   try {
     console.log("Fetching tickers from:", `${BASE_URL}/tickers`);
-    const response = await axiosInstance.get('/tickers');
+    const response = await axiosInstance.get<Ticker[]>('/tickers');
     console.log("Tickers received:", response.data);
     return response.data;
-  } catch (error) {
-    console.error("Error fetching tickers:", error.response ? error.response.data : error.message);
+  } catch (error: unknown) {
+    await handleRequestError<Ticker[]>(error, 'tickers', [], async (err) => {
+      throw new Error("Failed to fetch tickers");
+    });
     throw new Error("Failed to fetch tickers");
   }
 }
 
 export async function getDepth(market: string): Promise<Depth> {
-  const response = await axiosInstance.get(`/depth?symbol=${market}`);
-  return response.data;
+  try {
+    const response = await axiosInstance.get<Depth>(`/depth?symbol=${market}`);
+    return response.data;
+  } catch (error: unknown) {
+    await handleRequestError<Depth>(error, `depth for ${market}`, {} as Depth, async (err) => {
+      throw new Error(`Failed to fetch depth for ${market}`);
+    });
+    throw new Error(`Failed to fetch depth for ${market}`);
+  }
 }
 
 export async function getTrades(market: string): Promise<Trade[]> {
-  const response = await axiosInstance.get(`/trades?symbol=${market}`);
-  return response.data;
+  try {
+    const response = await axiosInstance.get<Trade[]>(`/trades?symbol=${market}`);
+    return response.data;
+  } catch (error: unknown) {
+    await handleRequestError<Trade[]>(error, `trades for ${market}`, [], async (err) => {
+      throw new Error(`Failed to fetch trades for ${market}`);
+    });
+    throw new Error(`Failed to fetch trades for ${market}`);
+  }
 }
 
 export async function getKlines(
@@ -48,9 +88,20 @@ export async function getKlines(
   startTime: number,
   endTime: number
 ): Promise<KLine[]> {
-  const response = await axiosInstance.get(
-    `/klines?symbol=${market}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
-  );
-  const data: KLine[] = response.data;
-  return data.sort((x, y) => (Number(x.end) < Number(y.end) ? -1 : 1));
+  try {
+    const response = await axiosInstance.get<KLine[]>(`/klines`, {
+      params: {
+        symbol: market,
+        interval,
+        startTime,
+        endTime,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    await handleRequestError<KLine[]>(error, `klines for ${market}`, [], async (err) => {
+      throw new Error(`Failed to fetch klines for ${market}`);
+    });
+    throw new Error(`Failed to fetch klines for ${market}`);
+  }
 }
