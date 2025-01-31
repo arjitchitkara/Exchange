@@ -13,36 +13,40 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, password } = loginSchema.parse(body);
 
-    // Get user from backend service
-    const response = await fetch(`http://localhost:3002/api/users/${email}`);
+    // Send login request to auth service instead of directly to prisma
+    const response = await fetch('https://exchange-proxy.arjitchitkara.me/backend/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
     
     if (!response.ok) {
+      console.error('Login failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        email
+      });
       return NextResponse.json(
         { message: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    const user = await response.json();
+    const data = await response.json();
+    
+    return NextResponse.json({ 
+      token: data.token,
+      user: {
+        email: data.user.email,
+        id: data.user.id
+      }
+    });
 
-    // Verify password
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      return NextResponse.json(
-        { message: "Invalid credentials" },
-        { status: 401 }
-      );
-    }
-
-    // Generate JWT
-    const token = jwt.sign(
-      { email: user.email },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '1d' }
-    );
-
-    return NextResponse.json({ token });
   } catch (error) {
+    console.error('Login error:', error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: "Invalid input data", errors: error.errors },

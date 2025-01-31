@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -14,10 +13,11 @@ export async function POST(req: Request) {
     const { email, password } = registerSchema.parse(body);
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Send to backend service
-    const response = await fetch('http://localhost:3002/api/users', {
+    // Updated URL to match nginx configuration
+    const response = await fetch('https://exchange-proxy.arjitchitkara.me/backend/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,18 +29,28 @@ export async function POST(req: Request) {
     });
 
     if (!response.ok) {
-      const data = await response.json();
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Registration failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+      
       return NextResponse.json(
-        { message: data.message || "Registration failed" },
+        { message: errorData.message || "Registration failed" },
         { status: response.status }
       );
     }
 
-    return NextResponse.json(
-      { message: "User registered successfully" },
-      { status: 201 }
-    );
+    const user = await response.json();
+    return NextResponse.json({ 
+      message: "Registration successful",
+      user: { email: user.email }
+    });
+
   } catch (error) {
+    console.error('Registration error:', error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: "Invalid input data", errors: error.errors },
