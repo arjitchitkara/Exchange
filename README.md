@@ -1,103 +1,158 @@
-
 # Exchange Project
 
-This project is designed to build an exchange system, divided into multiple parts. The project leverages various technologies including Kubernetes for orchestration and Docker for containerization.
+A comprehensive cryptocurrency exchange platform that provides real-time trading capabilities, market data visualization, and secure authentication. This project is structured in multiple parts, each focusing on different aspects of the exchange system.
 
-## Project Structure
+## 🌟 Features
+
+- Real-time cryptocurrency price tracking
+- Live order book visualization
+- Secure user authentication
+- Market data aggregation
+- WebSocket-based real-time updates
+- Responsive and modern UI
+- Proxy service for API rate limiting and caching
+- Multiple trading pairs support
+
+## 🏗️ Project Structure
 
 ### Part 1
-- **day-1**: Contains the tasks and code implemented on the first day of part 1.
-- **day-2**: Contains the tasks and code implemented on the second day of part 1.
 
-### Part 2
-- **api**: Backend APIs for managing and retrieving exchange data.
-- **db**: Database configuration and migration scripts.
-- **docker**: Docker configuration files for containerizing the application.
-- **engine**: Core engine logic for processing exchange transactions.
-- **frontend**: Frontend code for the exchange UI.
-- **mm**: Market-making algorithms and scripts.
-- **ws**: WebSocket server for real-time exchange updates.
+#### Day 2
 
-## Tech Stack
+- **binance-frontend-realtime/**: Real-time trading interface with WebSocket integration
+- **binance-frontend/**: Static version of the trading interface
+- **exchange-proxy/**: API proxy service for rate limiting and caching
+- **backend/**: Core backend services for the exchange
+- **auth-service/**: Authentication and authorization service
 
-- **Backend**:
-  - Node.js
-  - Express.js
-  - WebSocket (for real-time updates)
-  - Docker (for containerization)
-  - Kubernetes (for container orchestration)
-  
-- **Frontend**:
-  - Next.js
-  - Tailwind CSS
-  
-- **Database**:
-  - PostgreSQL
-  
-- **Others**:
-  - Docker: To containerize the application components for easy deployment.
-  - ORM: Prisma
-  - Kubernetes: For managing containerized applications in various environments.
-  - Git: Version control system to manage the project's codebase.
-  - Market Making Scripts: Python scripts for simulating and testing market-making strategies.
+## 🛠️ Tech Stack
 
-## Setup Instructions
+### Frontend
 
-1. **Clone the repository**:
+- **Next.js**: React framework for production-grade applications
+- **TypeScript**: For type-safe code
+- **TailwindCSS**: For modern, utility-first styling
+- **WebSocket**: For real-time data streaming
+- **Chart.js/TradingView**: For financial charts
+
+### Backend
+
+- **Node.js**: Runtime environment
+- **Express.js**: Web application framework
+- **WebSocket**: For real-time bi-directional communication
+- **JWT**: For secure authentication
+
+### Infrastructure
+
+- **Docker**: Application containerization
+- **Kubernetes**: Container orchestration
+- **Redis**: For caching and real-time data
+- **PostgreSQL**: Primary database
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- Docker and Docker Compose
+- Git
+
+### Installation
+
+1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
+   cd exchange
    ```
 
-2. **Navigate to the project directory**:
+2. **Start the Auth Service**
+
    ```bash
-   cd exchange-project
+   cd Part-1/day-2/auth-service
+   npm install
+   npm run dev
    ```
 
-3. **Setting up the backend**:
-   - Navigate to the `part-2/api` directory.
-   - Install dependencies:
-     ```bash
-     npm install
-     ```
-   - Start the backend server:
-     ```bash
-     npm start
-     ```
+3. **Launch the Backend**
 
-4. **Setting up the frontend**:
-   - Navigate to the `part-2/frontend` directory.
-   - Install dependencies:
-     ```bash
-     npm install
-     ```
-   - Start the frontend server:
-     ```bash
-     npm start
-     ```
+   ```bash
+   cd Part-1/day-2/backend
+   npm install
+   npm run dev
+   ```
 
-5. **Running the Docker containers**:
-   - Navigate to the `part-2/docker` directory.
-   - Build and run the containers:
-     ```bash
-     docker-compose up --build
-     ```
+4. **Set up the Exchange Proxy**
 
-6. **Deploying with Kubernetes**:
-   - Ensure your Kubernetes cluster is up and running.
-   - Deploy the application:
-     ```bash
-     kubectl apply -f part-2/k8s/
-     ```
+   ```bash
+   cd Part-1/day-2/exchange-proxy
+   npm install
+   npm run dev
+   ```
 
-7. **Database Migrations**:
-   - Navigate to the `part-2/db` directory.
-   - Run migration scripts to set up the database schema.
+5. **Run the Frontend Application**
+   ```bash
+   cd Part-1/day-2/binance-frontend-realtime
+   npm install
+   npm run dev
+   ```
 
-## Contributing
+## 🔧 Configuration
 
-Contributions are welcome! Please submit a pull request or open an issue to discuss your ideas.
+Create a `.env` file in each service directory with the following variables:
 
-## License
+```env
+# Auth Service
+JWT_SECRET=your_jwt_secret
+PORT=3001
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+# Backend
+DATABASE_URL=postgresql://user:password@localhost:5432/exchange
+REDIS_URL=redis://localhost:6379
+
+# Exchange Proxy
+BINANCE_API_KEY=your_binance_api_key
+RATE_LIMIT=100
+```
+
+## 📦 Docker Deployment
+
+Build and run all services using Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+## 🔐 Security
+
+- JWT-based authentication
+- Rate limiting on API endpoints
+- Input validation and sanitization
+- Secure WebSocket connections
+- Environment variable protection
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📫 Support
+
+For support, email [your-email@example.com](mailto:your-email@example.com) or open an issue in the repository.
+
+## 🙏 Acknowledgments
+
+- Binance API for market data
+- TradingView for charting libraries
+- The open-source community for various tools and libraries used in this project
+
+```
+
 ```
