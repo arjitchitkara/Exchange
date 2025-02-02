@@ -7,8 +7,10 @@ const BASE_URL = "https://exchange-proxy.arjitchitkara.me/api/v1";
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-  }
+    "Content-Type": "application/json",
+  },
+  // Enable credentials if cookies or other credentials are required
+  withCredentials: true,
 });
 
 // Type for error handler callback
@@ -47,11 +49,11 @@ export async function getTicker(market: string): Promise<Ticker> {
 export async function getTickers(): Promise<Ticker[]> {
   try {
     console.log("Fetching tickers from:", `${BASE_URL}/tickers`);
-    const response = await axiosInstance.get<Ticker[]>('/tickers');
+    const response = await axiosInstance.get<Ticker[]>("/tickers");
     console.log("Tickers received:", response.data);
     return response.data;
   } catch (error: unknown) {
-    await handleRequestError<Ticker[]>(error, 'tickers', [], async (err) => {
+    await handleRequestError<Ticker[]>(error, "tickers", [], async (err) => {
       throw new Error("Failed to fetch tickers");
     });
     throw new Error("Failed to fetch tickers");
