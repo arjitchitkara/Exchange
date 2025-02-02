@@ -1,8 +1,16 @@
 const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const axios = require("axios");
 const app = express();
 
 const targetUrl = "https://api.backpack.exchange"; // Target API server
+
+// Cache storage
+const cache = {
+  Tickers1: null,
+  Markets1: null,
+  lastUpdate: null,
+};
 
 // ✅ FIXED: Handle CORS correctly (Allow localhost:3000 & production domain)
 const allowedOrigins = [
@@ -30,7 +38,46 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Proxy Requests to Target API
+// Function to fetch data from Backpack API
+async function fetchBackpackData() {
+  try {
+    const [tickersResponse, marketsResponse] = await Promise.all([
+      axios.get(`${targetUrl}/api/v1/tickers`),
+      axios.get(`${targetUrl}/api/v1/markets`),
+    ]);
+
+    cache.Tickers1 = tickersResponse.data;
+    cache.Markets1 = marketsResponse.data;
+    cache.lastUpdate = new Date();
+
+    console.log("Cache updated at:", cache.lastUpdate);
+  } catch (error) {
+    console.error("Error fetching data:", error.message);
+  }
+}
+
+// Initialize cache and start periodic updates
+fetchBackpackData();
+setInterval(fetchBackpackData, 2000); // Update every 2 seconds
+
+// New endpoints to serve cached data
+app.get("/api/v1/Tickers1", (req, res) => {
+  if (cache.Tickers1) {
+    res.json(cache.Tickers1);
+  } else {
+    res.status(503).json({ error: "Cache not yet available" });
+  }
+});
+
+app.get("/api/v1/Markets1", (req, res) => {
+  if (cache.Markets1) {
+    res.json(cache.Markets1);
+  } else {
+    res.status(503).json({ error: "Cache not yet available" });
+  }
+});
+
+// Original proxy middleware for other routes
 app.use(
   "/",
   createProxyMiddleware({

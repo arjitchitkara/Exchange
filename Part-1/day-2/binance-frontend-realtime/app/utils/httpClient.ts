@@ -11,7 +11,31 @@ const axiosInstance = axios.create({
   },
   // Enable credentials if cookies or other credentials are required
   withCredentials: true,
+  timeout: 5000, // 5 second timeout
 });
+
+// Fallback data
+const FALLBACK_DATA = {
+  ticker: {
+    symbol: "",
+    firstPrice: "0",
+    high: "0",
+    lastPrice: "0",
+    low: "0",
+    priceChange: "0",
+    priceChangePercent: "0",
+    quoteVolume: "0",
+    trades: "0",
+    volume: "0"
+  } as Ticker,
+  depth: {
+    lastUpdateId: "0",
+    bids: [] as [string, string][],
+    asks: [] as [string, string][]
+  } as Depth,
+  trade: [] as Trade[],
+  kline: [] as KLine[]
+};
 
 // Type for error handler callback
 type ErrorHandler<T> = (error: AxiosError | Error) => Promise<T>;
@@ -38,25 +62,52 @@ async function handleRequestError<T>(
 }
 
 export async function getTicker(market: string): Promise<Ticker> {
-  const tickers = await getTickers();
-  const ticker = tickers.find((t) => t.symbol === market);
-  if (!ticker) {
-    throw new Error(`No ticker found for ${market}`);
+  try {
+    const tickers = await getTickers();
+    const ticker = tickers.find((t) => t.symbol === market);
+    if (!ticker) {
+      console.warn(`No ticker found for ${market}, using fallback data`);
+      return { ...FALLBACK_DATA.ticker, symbol: market };
+    }
+    return ticker;
+  } catch (error) {
+    console.warn(`Error in getTicker for ${market}, using fallback data`);
+    return { ...FALLBACK_DATA.ticker, symbol: market };
   }
-  return ticker;
 }
 
 export async function getTickers(): Promise<Ticker[]> {
   try {
-    console.log("Fetching tickers from:", `${BASE_URL}/tickers`);
-    const response = await axiosInstance.get<Ticker[]>("/tickers");
+    console.log("Fetching tickers from:", `${BASE_URL}/Tickers1`);
+    const response = await axiosInstance.get<Ticker[]>("/Tickers1");
     console.log("Tickers received:", response.data);
     return response.data;
   } catch (error: unknown) {
-    await handleRequestError<Ticker[]>(error, "tickers", [], async (err) => {
-      throw new Error("Failed to fetch tickers");
-    });
-    throw new Error("Failed to fetch tickers");
+    console.warn("Failed to fetch from /Tickers1, trying fallback endpoint");
+    try {
+      const response = await axiosInstance.get<Ticker[]>("/tickers");
+      return response.data;
+    } catch (fallbackError) {
+      console.warn("Both endpoints failed, returning empty array");
+      return [];
+    }
+  }
+}
+
+export async function getMarkets(): Promise<any[]> {
+  try {
+    console.log("Fetching markets from:", `${BASE_URL}/Markets1`);
+    const response = await axiosInstance.get<any[]>("/Markets1");
+    return response.data;
+  } catch (error: unknown) {
+    console.warn("Failed to fetch from /Markets1, trying fallback endpoint");
+    try {
+      const response = await axiosInstance.get<any[]>("/markets");
+      return response.data;
+    } catch (fallbackError) {
+      console.warn("Both endpoints failed, returning empty array");
+      return [];
+    }
   }
 }
 
@@ -65,10 +116,8 @@ export async function getDepth(market: string): Promise<Depth> {
     const response = await axiosInstance.get<Depth>(`/depth?symbol=${market}`);
     return response.data;
   } catch (error: unknown) {
-    await handleRequestError<Depth>(error, `depth for ${market}`, {} as Depth, async (err) => {
-      throw new Error(`Failed to fetch depth for ${market}`);
-    });
-    throw new Error(`Failed to fetch depth for ${market}`);
+    console.warn(`Failed to fetch depth for ${market}, using fallback data`);
+    return { ...FALLBACK_DATA.depth };
   }
 }
 
@@ -77,10 +126,8 @@ export async function getTrades(market: string): Promise<Trade[]> {
     const response = await axiosInstance.get<Trade[]>(`/trades?symbol=${market}`);
     return response.data;
   } catch (error: unknown) {
-    await handleRequestError<Trade[]>(error, `trades for ${market}`, [], async (err) => {
-      throw new Error(`Failed to fetch trades for ${market}`);
-    });
-    throw new Error(`Failed to fetch trades for ${market}`);
+    console.warn(`Failed to fetch trades for ${market}, using fallback data`);
+    return [...FALLBACK_DATA.trade];
   }
 }
 
@@ -101,9 +148,7 @@ export async function getKlines(
     });
     return response.data;
   } catch (error: unknown) {
-    await handleRequestError<KLine[]>(error, `klines for ${market}`, [], async (err) => {
-      throw new Error(`Failed to fetch klines for ${market}`);
-    });
-    throw new Error(`Failed to fetch klines for ${market}`);
+    console.warn(`Failed to fetch klines for ${market}, using fallback data`);
+    return [...FALLBACK_DATA.kline];
   }
 }
