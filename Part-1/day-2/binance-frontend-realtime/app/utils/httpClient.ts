@@ -113,21 +113,51 @@ export async function getMarkets(): Promise<any[]> {
 
 export async function getDepth(market: string): Promise<Depth> {
   try {
-    const response = await axiosInstance.get<Depth>(`/depth?symbol=${market}`);
+    // Try cached endpoint first
+    console.log(`🔍 Fetching depth from /Depth1 for ${market}`);
+    const response = await axiosInstance.get<Depth>(`/Depth1`, {
+      params: { symbol: market }
+    });
+    console.log(`✅ Successfully got depth data from /Depth1 for ${market}`);
     return response.data;
   } catch (error: unknown) {
-    console.warn(`Failed to fetch depth for ${market}, using fallback data`);
-    return { ...FALLBACK_DATA.depth };
+    console.warn(`⚠️ Failed to fetch from /Depth1, trying fallback endpoint for ${market}`);
+    try {
+      console.log(`🔄 Trying fallback depth endpoint for ${market}`);
+      const response = await axiosInstance.get<Depth>(`/depth`, {
+        params: { symbol: market }
+      });
+      console.log(`✅ Successfully got depth data from fallback for ${market}`);
+      return response.data;
+    } catch (fallbackError) {
+      console.warn(`❌ Both endpoints failed for ${market}, using fallback data`);
+      return { ...FALLBACK_DATA.depth };
+    }
   }
 }
 
 export async function getTrades(market: string): Promise<Trade[]> {
   try {
-    const response = await axiosInstance.get<Trade[]>(`/trades?symbol=${market}`);
+    // Try cached endpoint first
+    console.log(`🔍 Fetching trades from /Trades1 for ${market}`);
+    const response = await axiosInstance.get<Trade[]>(`/Trades1`, {
+      params: { symbol: market }
+    });
+    console.log(`✅ Successfully got trades data from /Trades1 for ${market}`);
     return response.data;
   } catch (error: unknown) {
-    console.warn(`Failed to fetch trades for ${market}, using fallback data`);
-    return [...FALLBACK_DATA.trade];
+    console.warn(`⚠️ Failed to fetch from /Trades1, trying fallback endpoint for ${market}`);
+    try {
+      console.log(`🔄 Trying fallback trades endpoint for ${market}`);
+      const response = await axiosInstance.get<Trade[]>(`/trades`, {
+        params: { symbol: market }
+      });
+      console.log(`✅ Successfully got trades data from fallback for ${market}`);
+      return response.data;
+    } catch (fallbackError) {
+      console.warn(`❌ Both endpoints failed for ${market}, using fallback data`);
+      return [...FALLBACK_DATA.trade];
+    }
   }
 }
 
@@ -138,7 +168,9 @@ export async function getKlines(
   endTime: number
 ): Promise<KLine[]> {
   try {
-    const response = await axiosInstance.get<KLine[]>(`/klines`, {
+    // Try cached endpoint first
+    console.log(`🔍 Fetching klines from /Klines1 for ${market} (${interval})`);
+    const response = await axiosInstance.get<KLine[]>(`/Klines1`, {
       params: {
         symbol: market,
         interval,
@@ -146,9 +178,25 @@ export async function getKlines(
         endTime,
       },
     });
+    console.log(`✅ Successfully got klines data from /Klines1 for ${market}`);
     return response.data;
   } catch (error: unknown) {
-    console.warn(`Failed to fetch klines for ${market}, using fallback data`);
-    return [...FALLBACK_DATA.kline];
+    console.warn(`⚠️ Failed to fetch from /Klines1, trying fallback endpoint for ${market}`);
+    try {
+      console.log(`🔄 Trying fallback klines endpoint for ${market}`);
+      const response = await axiosInstance.get<KLine[]>(`/klines`, {
+        params: {
+          symbol: market,
+          interval,
+          startTime,
+          endTime,
+        },
+      });
+      console.log(`✅ Successfully got klines data from fallback for ${market}`);
+      return response.data;
+    } catch (fallbackError) {
+      console.warn(`❌ Both endpoints failed for ${market}, using fallback data`);
+      return [...FALLBACK_DATA.kline];
+    }
   }
 }
